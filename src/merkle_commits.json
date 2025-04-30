@@ -1,0 +1,8 @@
+[
+  {
+    "period": "2025-04-23T00:25:34.548Z_2025-04-30T00:25:34.548Z",
+    "merkle_root": "ad4665e4ec177543a6568edd0697539a5cf755f8cf0576f41da6547c64d4fb7e",
+    "onchain_tx_hash": "75ee117933d0afab0adeb4c7d1f0542d56d140e73359dfe3620f8ccbc2a22110",
+    "committed_at": "2025-04-30T00:25:36.096Z"
+  }
+]

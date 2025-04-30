@@ -1,0 +1,1 @@
+export const ADDRESS = "addr_test1qqwvj9ew3xvteu5uqxdvpezy7fahrmgd85f4ah63ef08xfcueytjazvchnefcqv6crjyfunmw8ks60gntm04rjj7wvnskdq90s";
