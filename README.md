@@ -15,7 +15,7 @@ BLOCKFROST_PROJECT_ID= # blockforestのProject ID
 
 ## Run
 
-- Run Index.ts
+- Register Root Hash
 
 ダミートランザクションでルートハッシュを計算し、オンチェーントランザクションを投げる。
 
@@ -28,7 +28,32 @@ bun run index.ts
 実行したトランザクションのメタデータ内のルートハッシュを受け取り、オフチェーンで計算したルートハッシュと比較。
 
 ```bash
-bun run decode.ts <Merk
+bun run decode.ts
+```
+
+- Check Generate Root Hash & Verify Root Hash
+
+オフチェーンでマークルルートハッシュの生成と検証を行う。
+
+```bash
+bun run check_generate_root_hash_and_verify
+```
+
+- Check Generate Root Hash
+
+30,000件のダミートランザクションデータを作成して、マークルツリールートハッシュを計算しのち、オンチェーンに刻む処理を3回実行。
+
+```bash
+bun run check_generate_root_hash.ts
+```
+
+- Check Verify Root Hash
+
+オンチェーンのメタデータに保存されているマークルツリールートハッシュを取得し、`check_generate_root_hash.ts`の実行結果から1件、5件、100件、500件、1000件、5000件、10000件のトランザクションデータがマークルツリー内に含まれているか検証。
+
+
+```bash
+bun run check_verify_root_hash.ts
 ```
 
 - Generate Address

@@ -1,0 +1,26 @@
+[
+  {
+    "run": 1,
+    "metadata_id": 1,
+    "merkle_root": "e6d92c440375e592264bc0bcd175619727a8e238f4fd7be5f465e628639b7e42",
+    "processing_ms": 47,
+    "onchain_tx_hash": "8940102a692c769f2b8671c4acafcfb0502d8ab3ca3d53c61a28f19bfce3377b",
+    "committed_at": "2025-05-01T09:19:44.983Z"
+  },
+  {
+    "run": 2,
+    "metadata_id": 2,
+    "merkle_root": "073f4df0da0d1412742b585352fb70797ca6c937fd2dc5363ec48f5633160abc",
+    "processing_ms": 45,
+    "onchain_tx_hash": "6d5265f838ca442fb4a6748a51574dc6c7f35db14ac7ed6290b76d865552ad5c",
+    "committed_at": "2025-05-01T09:21:01.750Z"
+  },
+  {
+    "run": 3,
+    "metadata_id": 3,
+    "merkle_root": "eac0a1fae60b4b2fd22f9df97ed6691225f4f573459e2dcccb3eeefdf9e9bf64",
+    "processing_ms": 44,
+    "onchain_tx_hash": "b562771b18c54e1195a3267c566c16cf8cc64da4a2b13e49eeca5efff0263ab5",
+    "committed_at": "2025-05-01T09:21:48.543Z"
+  }
+]

@@ -1,8 +1,10 @@
 [
   {
-    "period": "2025-04-23T00:25:34.548Z_2025-04-30T00:25:34.548Z",
-    "merkle_root": "ad4665e4ec177543a6568edd0697539a5cf755f8cf0576f41da6547c64d4fb7e",
-    "onchain_tx_hash": "75ee117933d0afab0adeb4c7d1f0542d56d140e73359dfe3620f8ccbc2a22110",
-    "committed_at": "2025-04-30T00:25:36.096Z"
+    "run": 1,
+    "metadata_id": 1,
+    "merkle_root": "553da53648f683d26ca10fd6598515d2dbc087f6d5d1f99930c629d5daf241dd",
+    "processing_ms": 36,
+    "onchain_tx_hash": "ed51ad5909578df4a6a7486ddedf2e87bc11205686a3e773a6ffb5cb1f045046",
+    "committed_at": "2025-05-01T06:16:22.425Z"
   }
 ]
