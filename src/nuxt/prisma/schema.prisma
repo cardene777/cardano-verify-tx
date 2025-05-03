@@ -15,10 +15,9 @@ enum Position {
   RIGHT
 }
 
-/// ユーザー間のポイント移動を表すトランザクション
+/// ユーザー間のポイント移動を表すテーブル
 model Transaction {
-  /// トランザクションハッシュを主キーとする
-  id                String   @id
+  id                String   @id @default(cuid())
   /// 送信側ウォレット ID（オプション）
   from              String?
   /// 送信側から減算されるポイント数

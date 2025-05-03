@@ -20,6 +20,12 @@ bun run scripts/test/testMerkleRoot.ts
 bun run scripts/test/testVerifyTxHash.ts
 ```
 
+- 30,00件のダミーデータ作成
+
+```bash
+bun run scripts/test/createDummyTx.ts
+```
+
 - 1週間分のデータをDBから取得してマークルルートを計算してオンチェーンに送信
 
 ```bash
@@ -81,7 +87,7 @@ docker-compose exec api sh -c \
   "cd /usr/src/app && sqlite3 prisma/prisma/dev.db \"SELECT id FROM \\\"Transaction\\\" ORDER BY RANDOM() LIMIT 1;\""
 ```
 
-- 最新コミットの ID（on-chain TxHash）を取得
+- 最新コミットの ID（on-chain TxHash）を1件取得
 
 ```bash
 docker-compose exec api sh -c "\
@@ -102,6 +108,20 @@ docker-compose exec api sh -c "\
       WHERE commitId = (SELECT id FROM MerkleCommit ORDER BY label DESC LIMIT 1) \
    ORDER BY RANDOM() \
       LIMIT 1;\"\
+"
+```
+
+- 最新コミットの ID（on-chain TxHash）を取得して、ランダムに紐づくトランザクションを10件取得
+
+```bash
+docker-compose exec api sh -c "\
+  cd /usr/src/app && \
+  sqlite3 prisma/dev.db \
+    \"SELECT id \
+       FROM \\\"Transaction\\\" \
+      WHERE commitId = (SELECT id FROM MerkleCommit ORDER BY label DESC LIMIT 1) \
+   ORDER BY RANDOM() \
+      LIMIT 10;\"\
 "
 ```
 
