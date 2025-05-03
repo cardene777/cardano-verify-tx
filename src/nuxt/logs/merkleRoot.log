@@ -1,0 +1,12 @@
+api-1  | 🗂️ 期間: 2025-04-03T07:43:00.847Z ～ 2025-05-03T07:43:00.847Z
+api-1  | 📑 取得したトランザクション数: 90000
+api-1  | 🌳 Merkle Root (90000件): cc156d5c34b7401dbb3d2b75eb6cbd4f9098c6fa438ec98112e1a5cece5578c8
+api-1  | 🏠 ウォレットアドレス: addr_test1qqwvj9ew3xvteu5uqxdvpezy7fahrmgd85f4ah63ef08xfmxacdn7az80zx2yj2qatqdc6cwyy3gm3qv3xg0awusxk6sydguyu
+api-1  | 📤 Merkle ルートをオンチェーンへ送信中...
+api-1  | 📡 TxHash: 4776d6bda113216bba2548330f8ad7628212305567c2245a6e323605147b5bd4 を送信
+api-1  | ✅ トランザクション確定
+api-1  | 💾 DB に MerkleCommit を保存
+api-1  | ✅ MerkleCommit 作成: id = 4776d6bda113216bba2548330f8ad7628212305567c2245a6e323605147b5bd4
+api-1  | 🔗 Transaction レコードに commitId を設定
+api-1  | ✅ 90000 件の transaction に commitId を設定
+api-1  | 🎉 全処理完了

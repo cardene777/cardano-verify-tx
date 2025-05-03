@@ -1,0 +1,9 @@
+🚀 Calling http://localhost:3000/api/verifyTxHash with txHash=2c38c41cd8893bd3f4b92d4b3f2c84e305ee29c3b46c3ab58c7d8d31149cf4e5
+✅ HTTP 200 OK
+📦 Response body: {
+  "ok": true,
+  "txHash": "2c38c41cd8893bd3f4b92d4b3f2c84e305ee29c3b46c3ab58c7d8d31149cf4e5",
+  "merkleRoot": "2d621ba20c10cbf104cd5b5bf0888d123ce78bfdb354618a757c1a5fe4bf1dc9",
+  "included": true,
+  "message": "✅ トランザクションは Merkle ルートに含まれています"
+}

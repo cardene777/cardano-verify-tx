@@ -1,0 +1,77 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// 兄弟ノードの位置を示す列挙型
+enum Position {
+  LEFT
+  RIGHT
+}
+
+/// ユーザー間のポイント移動を表すトランザクション
+model Transaction {
+  /// トランザクションハッシュを主キーとする
+  id                String   @id
+  /// 送信側ウォレット ID（オプション）
+  from              String?
+  /// 送信側から減算されるポイント数
+  from_point_change Int
+  /// 受信側ウォレット ID（オプション）
+  to                String?
+  /// 受信側に加算されるポイント数
+  to_point_change   Int
+  /// このレコードの作成日時
+  created_at        DateTime @default(now())
+
+  /// どの MerkleCommit に含まれたか（一対多リレーション）
+  commitId String?
+  commit   MerkleCommit? @relation(fields: [commitId], references: [id])
+
+  /// 各コミットにおける証明パス（MerkleProof）
+  proofs MerkleProof[]
+}
+
+/// オンチェーンに記録した Merkle ルートのコミット情報
+model MerkleCommit {
+  /// メタデータ送信時のトランザクションハッシュを主キーとする
+  id           String        @id
+  /// 計算された Merkle ルート（16進文字列）
+  rootHash     String
+  /// ブロックチェーンに添付した metadata ラベル (例: run 回数)
+  label        Int
+  /// このコミットが対象とするデータ期間の開始日時
+  periodStart  DateTime
+  /// このコミットが対象とするデータ期間の終了日時
+  periodEnd    DateTime
+  /// レコード作成日時
+  committed_at DateTime      @default(now())
+  /// このコミットに含まれるトランザクション一覧
+  transactions Transaction[]
+  /// このコミットに紐づく全 MerkleProof
+  proofs       MerkleProof[]
+}
+
+/// あるコミットにおける一つの証明経路（兄弟ノード情報）を表す
+model MerkleProof {
+  /// 一意の証明エントリ ID（cuid 自動生成）
+  id       String       @id @default(cuid())
+  /// 関連するトランザクション
+  txId     String
+  tx       Transaction  @relation(fields: [txId], references: [id], onDelete: Cascade)
+  /// 関連するコミット
+  commitId String
+  commit   MerkleCommit @relation(fields: [commitId], references: [id], onDelete: Cascade)
+  /// 葉ノードのインデックス（並び順）
+  index    Int
+  /// 兄弟ノードのハッシュ（16進文字列）
+  sibling  String
+  /// 兄弟ノードが自葉ノードに対して左か右か
+  position Position
+}

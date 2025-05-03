@@ -1,5 +1,18 @@
 {
-  "devDependencies": {
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "nuxt": "^3.17.1",
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.1",
     "@emurgo/cardano-message-signing-nodejs": "^1.1.0",
     "@emurgo/cardano-serialization-lib-nodejs": "^14.1.1",
     "@types/bip39": "^3.0.4",
@@ -12,8 +25,5 @@
     "lucid-cardano": "0.10.11",
     "merkletreejs": "^0.5.2",
     "node-fetch": "^3.3.2"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.7.0"
   }
 }
