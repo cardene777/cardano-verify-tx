@@ -1,0 +1,231 @@
+openapi: 3.0.3
+info:
+  title: Merkle Commit Service
+  version: 1.0.2
+  description: |
+    API group that  
+
+    1. **/api/merkle** – builds a Merkle tree for freshly‑created  
+       transactions, commits the root on Cardano *Preprod* and stores all proofs.  
+    2. **/api/verify** – verifies one or many transaction IDs against their
+       on‑chain Merkle root.
+
+servers:
+  - url: http://localhost:3000
+    description: Local development server
+
+tags:
+  - name: merkle
+    description: Merkle‑tree related operations (commit & verification)
+
+paths:
+  /api/merkle:
+    $ref: "#/components/x-internal/merkle"
+
+  /api/verify:
+    post:
+      tags: [merkle]
+      summary: Verify that one or more txIds are included in their Merkle root
+      operationId: postVerify
+      description: |
+        Accepts an array of Cardano **transaction IDs** (`txIds`) and checks each
+        of them against the corresponding on‑chain Merkle root.
+
+        * **すべて成功** ➜ **HTTP 200** + `VerifySuccess`  
+        * **入力が空**   ➜ **HTTP 400** + `ErrorObject`  
+        * **1 件でも失敗**  
+          （DB 不存在／メタデータ欠落／ルート不一致など）  
+          ➜ **HTTP 500** + `VerifyFailure`  
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [txIds]
+              properties:
+                txIds:
+                  type: array
+                  description: One or more Cardano transaction IDs (lower‑case hex)
+                  items:
+                    type: string
+                    pattern: "^[0-9a-f]{64}$"
+                  example:
+                    - cma89p5zd03avpi0jcu0bcalz0000000000000000000000000000000000000000
+                    - cma89p66u0ipkpi0jyi6fw1mj0000000000000000000000000000000000000000
+      responses:
+        "200":
+          description: All requested txIds were verified **成功** かつ **included = true**
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifySuccess"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          description: |
+            One or more verifications failed  
+            ‑ または ‑ DB に存在しない txId が含まれていた
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyFailure"
+
+components:
+  schemas:
+    # ── /api/merkle success ────────────────────────────────
+    ProcessSuccess:
+      type: object
+      required: [ok, message]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: MerkleCommit 作成＆オンチェーン＆証明保存完了
+
+    # ── /api/verify 個別結果 ─────────────────────────
+    VerifyResult:
+      type: object
+      required: [txId, ok, message]
+      properties:
+        txId:
+          type: string
+          description: Transaction ID that was checked
+          example: cma89p5zd03avpi0jcu0bcalz0000000000000000000000000000000000000000
+        ok:
+          type: boolean
+          description: True if verification flow finished without internal error  
+          example: true
+        merkle:
+          type: string
+          description: Hex‑encoded Merkle root used for comparison
+          example: a95d7e43b25f66106cf51bbd7e92b458bda4ac82cfa95276eb73d0070e8579c8
+        included:
+          type: boolean
+          description: Whether the txId is actually contained in the Merkle tree
+          example: true
+        message:
+          type: string
+          example: ✅ トランザクションは Merkle ルートに含まれています
+        error:
+          type: string
+          description: Present only if `ok` is false
+
+    # ── /api/verify 成功(全件OK) ─────────────────────
+    VerifySuccess:
+      type: object
+      required: [ok, results]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/VerifyResult"
+
+    # ── /api/verify 失敗(1件でもNG) ───────────────────
+    VerifyFailure:
+      type: object
+      required: [ok, results]
+      properties:
+        ok:
+          type: boolean
+          example: false
+        results:
+          type: array
+          description: Per‑transaction verification outcome (includes失敗理由)
+          items:
+            $ref: "#/components/schemas/VerifyResult"
+
+    # ── 共通 ErrorObject ─────────────────────────────────────
+    ErrorObject:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: string
+          description: Human‑readable error description
+          example: txIds が空です
+
+  # ── 再利用エラーレスポンス ───────────────────────────────
+  responses:
+    BadRequest:
+      description: The request was malformed
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorObject"
+    InternalError:
+      description: Unexpected server‑side failure
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorObject"
+
+  # ── merkle パス定義（内部参照）──────────────────────
+  x-internal:
+    merkle:
+      post:
+        tags: [merkle]
+        summary: Build & commit a Merkle tree for un‑committed transactions
+        operationId: postMerkleRoot
+        description: |
+          Commits a new Merkle root **only** when there are un‑committed
+          `Transaction` rows.
+
+          1. **期間決定**  
+             * If environment variable **`PERIODOFFSET_DAYS`** is set to a
+               positive integer, `periodStart = now − PERIODOFFSET_DAYS`.  
+             * Otherwise, `periodStart` equals the previous commit’s
+               **periodEnd**, or 30 days back when no commits exist.
+
+          2. Reads every `Transaction` whose **created_at** lies in  
+             `[periodStart, periodEnd)` and **commitId is NULL**.  
+
+          3. Builds a **sorted SHA‑256 Merkle tree**, stores the root on‑chain
+             (Cardano Preprod) as transaction metadata, waits for confirmation,
+             then records:  
+             &nbsp;&nbsp;• **MerkleCommit** row  
+             &nbsp;&nbsp;• updates each `Transaction.commitId`  
+             &nbsp;&nbsp;• bulk‑inserts **MerkleProof** rows in chunks of 1 000.
+
+          4. If *no* transactions are found, the endpoint aborts with
+             **HTTP 400**.
+
+        requestBody:
+          required: false
+          content:
+            application/json:
+              schema:
+                type: object
+                description: An empty JSON object (ignored)
+
+        responses:
+          "200":
+            description: Processing finished successfully
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ProcessSuccess"
+          "400":
+            description: |
+              * `PERIODOFFSET_DAYS` is negative / non‑numeric, or  
+              * No un‑committed transactions were found.
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ErrorObject"
+          "500":
+            $ref: "#/components/responses/InternalError"
+          "504":
+            description: Transaction took longer than 15 minutes to confirm
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/ErrorObject"
